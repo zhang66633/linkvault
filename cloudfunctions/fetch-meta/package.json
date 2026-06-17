@@ -1,0 +1,9 @@
+{
+  "name": "linkvault-fetch-meta",
+  "version": "1.0.0",
+  "description": "国内 IP 网页元数据抓取云函数",
+  "main": "index.js",
+  "engines": {
+    "node": ">=18"
+  }
+}

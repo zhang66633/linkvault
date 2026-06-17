@@ -1,0 +1,69 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ImageOff } from 'lucide-react';
+import CategoryChip from './CategoryChip';
+import type { IBookmark, ICategory } from '@/types';
+
+interface Props {
+  bookmark: IBookmark;
+  category?: ICategory;
+}
+
+export default function BookmarkCard({ bookmark, category }: Props) {
+  const navigate = useNavigate();
+  const [imgError, setImgError] = useState(false);
+
+  return (
+    <button
+      type="button"
+      onClick={() => navigate(`/bookmark/${bookmark.id}`)}
+      className="block w-full text-left bg-white rounded-2xl overflow-hidden
+        shadow-[6px_6px_14px_rgba(0,0,0,0.05),-4px_-4px_12px_rgba(255,255,255,0.9)]
+        active:scale-[0.98] transition-all duration-200 cursor-pointer"
+    >
+      {/* 封面图 */}
+      {bookmark.coverImage && !imgError ? (
+        <div className="aspect-[4/3] overflow-hidden">
+          <img
+            src={bookmark.coverImage}
+            alt={bookmark.title}
+            className="w-full h-full object-cover"
+            loading="lazy"
+            onError={() => setImgError(true)}
+          />
+        </div>
+      ) : (
+        <div
+          className="aspect-[4/3] flex items-center justify-center"
+          style={{
+            background: 'linear-gradient(135deg, rgba(225,112,85,0.15), rgba(225,112,85,0.03))',
+          }}
+        >
+          <ImageOff size={28} className="text-coral/30" />
+        </div>
+      )}
+
+      {/* 信息区 */}
+      <div className="p-3">
+        {/* 标题 */}
+        <h3 className="text-[14px] font-semibold text-text-primary line-clamp-1 mb-1.5">
+          {bookmark.title || '无标题'}
+        </h3>
+
+        {/* 分类标签 */}
+        {category && (
+          <div className="mb-1.5">
+            <CategoryChip name={category.name} color={category.color} small />
+          </div>
+        )}
+
+        {/* AI 摘要预览 */}
+        {bookmark.summary && (
+          <p className="text-[12px] text-text-secondary line-clamp-2 leading-relaxed">
+            {bookmark.summary}
+          </p>
+        )}
+      </div>
+    </button>
+  );
+}

@@ -1,0 +1,12 @@
+{
+  "envId": "rss-d0g4abivmd539ea4f",
+  "functionRoot": "./cloudfunctions",
+  "functions": [
+    {
+      "name": "fetch-meta",
+      "runtime": "Nodejs18.15",
+      "handler": "index.main",
+      "timeout": 15
+    }
+  ]
+}

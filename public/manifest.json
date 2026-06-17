@@ -1,0 +1,17 @@
+{
+  "name": "LinkVault - 我的网页收藏",
+  "short_name": "LinkVault",
+  "description": "收藏网页，AI 摘要，随时回顾",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FAF9F7",
+  "theme_color": "#E17055",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
