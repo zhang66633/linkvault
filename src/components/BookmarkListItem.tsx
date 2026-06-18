@@ -29,7 +29,7 @@ export default function BookmarkListItem({ bookmark, category }: Props) {
       type="button"
       onClick={() => navigate(`/bookmark/${bookmark.id}`)}
       className="flex items-center gap-3 py-2.5 border-b border-border/30 last:border-b-0
-        active:bg-black/[0.02] transition-colors cursor-pointer w-full text-left"
+        active:bg-black/[0.02] hover:bg-black/[0.02] transition-colors cursor-pointer w-full text-left"
     >
       {/* 左侧：小缩略图或首字头像 */}
       {bookmark.coverImage && !imgError ? (

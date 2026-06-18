@@ -17,10 +17,15 @@ export default function BookmarkCard({ bookmark, category }: Props) {
     <button
       type="button"
       onClick={() => navigate(`/bookmark/${bookmark.id}`)}
-      className="block w-full text-left bg-white rounded-2xl overflow-hidden
-        shadow-[6px_6px_14px_rgba(0,0,0,0.05),-4px_-4px_12px_rgba(255,255,255,0.9)]
-        active:scale-[0.98] transition-all duration-200 cursor-pointer"
+      className="block w-full text-left
+        active:scale-[0.98] transition-transform duration-200 cursor-pointer"
     >
+      <div className="bg-white rounded-2xl overflow-hidden
+        shadow-[6px_6px_14px_rgba(0,0,0,0.05),-4px_-4px_12px_rgba(255,255,255,0.9)]
+        hover:shadow-[0_8px_28px_rgba(0,0,0,0.12)]
+        hover:-translate-y-0.5
+        transition-all duration-200"
+      >
       {/* 封面图 */}
       {bookmark.coverImage && !imgError ? (
         <div className="aspect-[4/3] overflow-hidden">
@@ -61,6 +66,7 @@ export default function BookmarkCard({ bookmark, category }: Props) {
             {bookmark.summary}
           </p>
         )}
+      </div>
       </div>
     </button>
   );
