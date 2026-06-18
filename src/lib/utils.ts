@@ -104,6 +104,22 @@ export async function fetchMetaFromBrowser(url: string): Promise<ClientFetchResu
   }
 }
 
+// —— 头像占位符颜色（标题哈希取色，同标题始终同色） ——
+
+const AVATAR_PALETTE = [
+  '#E17055', '#E74C3C', '#F39C12', '#27AE60', '#1ABC9C',
+  '#3498DB', '#9B59B6', '#E91E63', '#FF6F61', '#6C5CE7',
+] as const;
+
+export function getAvatarColor(title: string): string {
+  let hash = 0;
+  for (let i = 0; i < title.length; i++) {
+    hash = title.charCodeAt(i) + ((hash << 5) - hash);
+    hash = hash & hash;
+  }
+  return AVATAR_PALETTE[Math.abs(hash) % AVATAR_PALETTE.length];
+}
+
 export function formatDate(ts: number): string {
   const d = new Date(ts);
   const now = new Date();

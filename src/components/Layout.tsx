@@ -16,9 +16,9 @@ export default function Layout() {
   const title = isDetail ? '收藏详情' : (TITLE_MAP[location.pathname] || 'LinkVault');
 
   return (
-    <div className="min-h-screen bg-warm-bg max-w-lg mx-auto">
+    <div className="min-h-screen bg-warm-bg max-w-lg lg:max-w-6xl xl:max-w-7xl mx-auto">
       {/* 顶栏 */}
-      <header className="sticky top-0 z-30 bg-warm-bg/80 backdrop-blur-md px-4 py-3
+      <header className="sticky top-0 z-30 bg-warm-bg/80 backdrop-blur-md px-4 lg:px-8 xl:px-12 py-3
         flex items-center justify-between border-b border-border/50">
         <div className="flex items-center gap-3">
           {!isHome && (

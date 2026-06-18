@@ -183,7 +183,7 @@ export default function AddPage() {
   };
 
   return (
-    <div className="px-4 py-4 pb-24">
+    <div className="px-4 lg:px-8 xl:px-12 py-4 pb-24">
       {/* 步骤 1: URL 输入 */}
       <div className="mb-4">
         <label className="text-[13px] font-medium text-text-secondary mb-1.5 block">

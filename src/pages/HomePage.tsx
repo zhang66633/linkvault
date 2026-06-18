@@ -1,8 +1,9 @@
 import { useState, useMemo, useCallback } from 'react';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, LayoutGrid, List } from 'lucide-react';
 import SearchBar from '@/components/SearchBar';
 import CategoryFilter from '@/components/CategoryFilter';
 import BookmarkCard from '@/components/BookmarkCard';
+import BookmarkListItem from '@/components/BookmarkListItem';
 import FAB from '@/components/FAB';
 import EmptyState from '@/components/EmptyState';
 import LoadingSpinner from '@/components/LoadingSpinner';
@@ -14,6 +15,19 @@ export default function HomePage() {
   const { categories } = useCategories();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null);
+
+  // 视图模式（localStorage 持久化）
+  const [viewMode, setViewMode] = useState<'card' | 'list'>(() => {
+    return (localStorage.getItem('lv-view') as 'card' | 'list') || 'card';
+  });
+
+  const toggleView = useCallback(() => {
+    setViewMode((prev) => {
+      const next = prev === 'card' ? 'list' : 'card';
+      localStorage.setItem('lv-view', next);
+      return next;
+    });
+  }, []);
 
   const categoryMap = useMemo(() => {
     const map = new Map(categories.map((c) => [c.id, c]));
@@ -64,9 +78,24 @@ export default function HomePage() {
       </div>
 
       <div className="pt-2">
-        {/* 搜索栏 */}
-        <div className="px-4 pb-3">
-          <SearchBar value={searchQuery} onChange={setSearchQuery} />
+        {/* 搜索栏 + 视图切换 */}
+        <div className="flex items-center gap-2 px-4 lg:px-8 xl:px-12 pb-3">
+          <div className="flex-1">
+            <SearchBar value={searchQuery} onChange={setSearchQuery} />
+          </div>
+          <button
+            type="button"
+            onClick={toggleView}
+            className="w-11 h-11 flex items-center justify-center rounded-xl bg-white border border-border
+              hover:border-coral/40 transition-colors cursor-pointer flex-shrink-0"
+            aria-label={viewMode === 'card' ? '切换到列表视图' : '切换到卡片视图'}
+          >
+            {viewMode === 'card' ? (
+              <List size={20} className="text-text-secondary" />
+            ) : (
+              <LayoutGrid size={20} className="text-text-secondary" />
+            )}
+          </button>
         </div>
 
         {/* 分类筛选 */}
@@ -77,7 +106,7 @@ export default function HomePage() {
         />
 
         {/* 内容区 */}
-        <div className="px-4 pt-3 pb-24">
+        <div className="px-4 lg:px-8 xl:px-12 pt-3 pb-24">
           {loading ? (
             <LoadingSpinner text="加载收藏..." />
           ) : filtered.length === 0 ? (
@@ -95,10 +124,20 @@ export default function HomePage() {
                 description="试试其他关键词或分类"
               />
             )
-          ) : (
-            <div className="grid grid-cols-2 gap-3">
+          ) : viewMode === 'card' ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
               {filtered.map((bm) => (
                 <BookmarkCard
+                  key={bm.id}
+                  bookmark={bm}
+                  category={categoryMap.get(bm.categoryId)}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col">
+              {filtered.map((bm) => (
+                <BookmarkListItem
                   key={bm.id}
                   bookmark={bm}
                   category={categoryMap.get(bm.categoryId)}

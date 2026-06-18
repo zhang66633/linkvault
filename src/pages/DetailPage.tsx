@@ -4,16 +4,17 @@ import {
   ExternalLink,
   Sparkles,
   Trash2,
-  ImageOff,
   Calendar,
   Tag,
   Upload,
   Link2,
+  X,
 } from 'lucide-react';
 import { useBookmark, useBookmarkActions } from '@/hooks/useBookmarks';
 import { useCategories } from '@/hooks/useBookmarks';
 import { summarize } from '@/lib/api';
 import { formatDate } from '@/lib/utils';
+import AvatarPlaceholder from '@/components/AvatarPlaceholder';
 import CategoryChip from '@/components/CategoryChip';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import LoadingSpinner from '@/components/LoadingSpinner';
@@ -34,10 +35,15 @@ export default function DetailPage() {
   const [summarizing, setSummarizing] = useState(false);
   const [summaryError, setSummaryError] = useState('');
 
+  // —— 标签编辑 ——
+  const [localTags, setLocalTags] = useState<string[]>(bookmark?.tags ?? []);
+  const [tagInput, setTagInput] = useState('');
+
   useEffect(() => {
     if (bookmark) {
       setCoverImage(bookmark.coverImage);
       setImgError(false);
+      setLocalTags(bookmark.tags);
     }
   }, [bookmark]);
 
@@ -93,6 +99,24 @@ export default function DetailPage() {
     navigate('/', { replace: true });
   };
 
+  const handleAddTag = async () => {
+    const t = tagInput.trim();
+    if (!t || localTags.includes(t)) {
+      setTagInput('');
+      return;
+    }
+    const newTags = [...localTags, t];
+    setLocalTags(newTags);
+    setTagInput('');
+    await update(bookmark.id, { tags: newTags });
+  };
+
+  const handleRemoveTag = async (tag: string) => {
+    const newTags = localTags.filter((x) => x !== tag);
+    setLocalTags(newTags);
+    await update(bookmark.id, { tags: newTags });
+  };
+
   return (
     <div className="pb-24">
       {/* 封面大图 */}
@@ -110,12 +134,19 @@ export default function DetailPage() {
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="w-full aspect-[16/10] flex flex-col items-center justify-center gap-2
-              bg-gradient-to-br from-coral/15 to-coral/5 cursor-pointer
-              hover:from-coral/20 hover:to-coral/10 transition-colors"
+            className="w-full aspect-[16/10] cursor-pointer relative group overflow-hidden"
           >
-            <ImageOff size={48} className="text-coral/25" />
-            <span className="text-[12px] text-coral/60">点击上传封面图</span>
+            <AvatarPlaceholder
+              title={bookmark.title}
+              className="w-full h-full"
+              charClassName="text-5xl"
+            />
+            {/* 悬停提示层 */}
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+              <span className="opacity-0 group-hover:opacity-100 text-white text-[13px] font-medium bg-black/40 px-3 py-1.5 rounded-lg transition-opacity">
+                点击上传封面图
+              </span>
+            </div>
           </button>
         )}
 
@@ -148,7 +179,7 @@ export default function DetailPage() {
       </div>
 
       {/* 图片编辑工具栏 */}
-      <div className="flex gap-2 px-4 mt-2">
+      <div className="flex gap-2 px-4 lg:px-8 xl:px-12 mt-2">
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
@@ -181,7 +212,7 @@ export default function DetailPage() {
 
       {/* 图片链接输入 */}
       {showImageInput === 'url' && (
-        <div className="flex gap-2 px-4 mt-2">
+        <div className="flex gap-2 px-4 lg:px-8 xl:px-12 mt-2">
           <input
             type="url"
             value={imageUrlInput}
@@ -204,7 +235,7 @@ export default function DetailPage() {
       )}
 
       {/* 信息区 */}
-      <div className="px-4 py-4">
+      <div className="px-4 lg:px-8 xl:px-12 py-4">
         {/* 标题 */}
         <h1 className="text-[20px] font-semibold text-text-primary mb-3 leading-snug">
           {bookmark.title || '无标题'}
@@ -257,25 +288,49 @@ export default function DetailPage() {
           </p>
         </div>
 
-        {/* 标签 */}
-        {bookmark.tags.length > 0 && (
-          <div className="mb-4">
-            <span className="text-[12px] font-medium text-text-secondary flex items-center gap-1 mb-2">
-              <Tag size={13} />
-              标签
-            </span>
-            <div className="flex flex-wrap gap-1.5">
-              {bookmark.tags.map((t) => (
-                <span
-                  key={t}
-                  className="px-2.5 py-1 rounded-full bg-coral-light text-coral text-[12px]"
+        {/* 标签（可编辑） */}
+        <div className="mb-4">
+          <span className="text-[12px] font-medium text-text-secondary flex items-center gap-1 mb-2">
+            <Tag size={13} />
+            标签
+          </span>
+          <div className="flex flex-wrap gap-1.5">
+            {localTags.map((t) => (
+              <span
+                key={t}
+                className="inline-flex items-center gap-1 px-2.5 py-1
+                  rounded-full bg-coral-light text-coral text-[12px]"
+              >
+                {t}
+                <button
+                  type="button"
+                  onClick={() => handleRemoveTag(t)}
+                  className="cursor-pointer hover:text-red-500 transition-colors"
+                  aria-label={`删除标签 ${t}`}
                 >
-                  {t}
-                </span>
-              ))}
-            </div>
+                  <X size={12} />
+                </button>
+              </span>
+            ))}
+            {/* 内联标签输入框 */}
+            <input
+              type="text"
+              value={tagInput}
+              onChange={(e) => setTagInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleAddTag();
+                }
+              }}
+              placeholder="+ 添加标签"
+              className="w-24 h-7 px-2.5 rounded-full bg-white border border-dashed border-coral/30
+                text-[12px] text-text-primary placeholder:text-text-secondary/60
+                focus:outline-none focus:border-coral/50 focus:w-32
+                transition-all duration-200"
+            />
           </div>
-        )}
+        </div>
 
         {/* 操作按钮组 */}
         <div className="flex gap-3 mt-6">

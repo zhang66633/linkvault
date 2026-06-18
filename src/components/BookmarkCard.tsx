@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ImageOff } from 'lucide-react';
+import AvatarPlaceholder from './AvatarPlaceholder';
 import CategoryChip from './CategoryChip';
 import type { IBookmark, ICategory } from '@/types';
 
@@ -33,14 +33,11 @@ export default function BookmarkCard({ bookmark, category }: Props) {
           />
         </div>
       ) : (
-        <div
-          className="aspect-[4/3] flex items-center justify-center"
-          style={{
-            background: 'linear-gradient(135deg, rgba(225,112,85,0.15), rgba(225,112,85,0.03))',
-          }}
-        >
-          <ImageOff size={28} className="text-coral/30" />
-        </div>
+        <AvatarPlaceholder
+          title={bookmark.title}
+          className="aspect-[4/3]"
+          charClassName="text-3xl"
+        />
       )}
 
       {/* 信息区 */}
