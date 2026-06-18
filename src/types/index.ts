@@ -5,6 +5,7 @@ export interface IBookmark {
   description: string;
   coverImage: string;
   summary: string;
+  avatarText?: string;
   categoryId: string;
   tags: string[];
   createdAt: number;

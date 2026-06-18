@@ -15,6 +15,10 @@ export class LinkVaultDB extends Dexie {
       bookmarks: 'id, categoryId, createdAt, title, url',
       categories: 'id, name, createdAt',
     });
+    this.version(3).stores({
+      bookmarks: 'id, categoryId, createdAt, title, url',
+      categories: 'id, name, createdAt',
+    });
   }
 }
 

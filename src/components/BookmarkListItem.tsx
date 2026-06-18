@@ -43,6 +43,7 @@ export default function BookmarkListItem({ bookmark, category }: Props) {
       ) : (
         <AvatarPlaceholder
           title={bookmark.title}
+          text={bookmark.avatarText}
           className="w-10 h-10 rounded-lg flex-shrink-0"
           charClassName="text-base"
         />

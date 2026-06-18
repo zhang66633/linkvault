@@ -39,11 +39,21 @@ export default function DetailPage() {
   const [localTags, setLocalTags] = useState<string[]>(bookmark?.tags ?? []);
   const [tagInput, setTagInput] = useState('');
 
+  // —— 分类编辑 ——
+  const [localCategoryId, setLocalCategoryId] = useState(bookmark?.categoryId ?? '');
+
+  // —— 头像文字编辑 ——
+  const [avatarText, setAvatarText] = useState(bookmark?.avatarText ?? '');
+  const [editingAvatar, setEditingAvatar] = useState(false);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
     if (bookmark) {
       setCoverImage(bookmark.coverImage);
       setImgError(false);
       setLocalTags(bookmark.tags);
+      setLocalCategoryId(bookmark.categoryId);
+      setAvatarText(bookmark.avatarText ?? '');
     }
   }, [bookmark]);
 
@@ -51,7 +61,7 @@ export default function DetailPage() {
     return <LoadingSpinner text="加载中..." />;
   }
 
-  const category = categories.find((c) => c.id === bookmark.categoryId);
+  const category = categories.find((c) => c.id === localCategoryId);
 
   const handleOpenLink = () => {
     window.open(bookmark.url, '_blank', 'noopener,noreferrer');
@@ -117,12 +127,25 @@ export default function DetailPage() {
     await update(bookmark.id, { tags: newTags });
   };
 
+  const handleCategoryChange = async (catId: string) => {
+    const nextId = localCategoryId === catId ? '' : catId;
+    setLocalCategoryId(nextId);
+    await update(bookmark.id, { categoryId: nextId });
+  };
+
+  const handleAvatarTextSave = async () => {
+    setEditingAvatar(false);
+    const trimmed = avatarText.trim().slice(0, 10);
+    setAvatarText(trimmed);
+    await update(bookmark.id, { avatarText: trimmed || undefined });
+  };
+
   return (
     <div className="pb-24">
       {/* 封面大图 */}
       <div className="relative group">
         {coverImage && !imgError ? (
-          <div className="aspect-[16/10] overflow-hidden">
+          <div className="aspect-[16/10] lg:max-h-80 overflow-hidden rounded-none lg:rounded-2xl">
             <img
               src={coverImage}
               alt={bookmark.title}
@@ -134,10 +157,11 @@ export default function DetailPage() {
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="w-full aspect-[16/10] cursor-pointer relative group overflow-hidden"
+            className="w-full aspect-[16/10] lg:max-h-80 cursor-pointer relative group overflow-hidden"
           >
             <AvatarPlaceholder
               title={bookmark.title}
+              text={avatarText || undefined}
               className="w-full h-full"
               charClassName="text-5xl"
             />
@@ -234,6 +258,42 @@ export default function DetailPage() {
         </div>
       )}
 
+      {/* 头像文字编辑 */}
+      <div className="px-4 lg:px-8 xl:px-12 mt-2">
+        {editingAvatar ? (
+          <div className="flex items-center gap-2">
+            <input
+              ref={avatarInputRef}
+              type="text"
+              value={avatarText}
+              onChange={(e) => setAvatarText(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleAvatarTextSave();
+                if (e.key === 'Escape') { setEditingAvatar(false); setAvatarText(bookmark?.avatarText ?? ''); }
+              }}
+              onBlur={handleAvatarTextSave}
+              maxLength={10}
+              placeholder="输入显示文字（最多10字）"
+              autoFocus
+              className="flex-1 h-9 px-3 rounded-lg bg-white border border-coral/50
+                text-[13px] text-text-primary placeholder:text-text-secondary/60
+                focus:outline-none focus:border-coral"
+            />
+            <span className="text-[11px] text-text-secondary flex-shrink-0">
+              {avatarText.length}/10
+            </span>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => { setEditingAvatar(true); setTimeout(() => avatarInputRef.current?.focus(), 0); }}
+            className="text-[12px] text-text-secondary hover:text-coral transition-colors cursor-pointer"
+          >
+            头像文字：{avatarText || '未设置（取标题首字）'} — 点击编辑
+          </button>
+        )}
+      </div>
+
       {/* 信息区 */}
       <div className="px-4 lg:px-8 xl:px-12 py-4">
         {/* 标题 */}
@@ -250,6 +310,24 @@ export default function DetailPage() {
             <Calendar size={13} />
             {formatDate(bookmark.createdAt)}
           </span>
+        </div>
+
+        {/* 分类选择 */}
+        <div className="mb-4">
+          <label className="text-[12px] font-medium text-text-secondary flex items-center gap-1 mb-2">
+            分类
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {categories.map((cat) => (
+              <CategoryChip
+                key={cat.id}
+                name={cat.name}
+                color={cat.color}
+                selected={localCategoryId === cat.id}
+                onClick={() => handleCategoryChange(cat.id)}
+              />
+            ))}
+          </div>
         </div>
 
         {/* 描述 */}

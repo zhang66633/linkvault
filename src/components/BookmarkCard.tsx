@@ -35,6 +35,7 @@ export default function BookmarkCard({ bookmark, category }: Props) {
       ) : (
         <AvatarPlaceholder
           title={bookmark.title}
+          text={bookmark.avatarText}
           className="aspect-[4/3]"
           charClassName="text-3xl"
         />

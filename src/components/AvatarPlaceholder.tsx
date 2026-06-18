@@ -6,6 +6,8 @@ interface Props {
   className?: string;
   /** 文字大小 class */
   charClassName?: string;
+  /** 自定义文字，最多 10 字；不设时取标题首字 */
+  text?: string;
 }
 
 /** 无封面图时的首字占位头像 — 白字居中，彩色背景 */
@@ -13,8 +15,9 @@ export default function AvatarPlaceholder({
   title,
   className = '',
   charClassName = 'text-3xl',
+  text,
 }: Props) {
-  const firstChar = title?.trim()?.[0]?.toUpperCase() || '?';
+  const display = text?.trim() || title?.trim()?.[0]?.toUpperCase() || '?';
   const bgColor = getAvatarColor(title);
 
   return (
@@ -23,7 +26,7 @@ export default function AvatarPlaceholder({
       style={{ backgroundColor: bgColor }}
     >
       <span className={`font-bold text-white ${charClassName}`}>
-        {firstChar}
+        {display}
       </span>
     </div>
   );

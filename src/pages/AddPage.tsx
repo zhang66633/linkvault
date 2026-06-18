@@ -66,6 +66,9 @@ export default function AddPage() {
   const [summarizing, setSummarizing] = useState(false);
   const [summaryError, setSummaryError] = useState('');
 
+  // 头像文字
+  const [avatarText, setAvatarText] = useState('');
+
   const handleFetch = async () => {
     if (!validateUrl(url)) {
       setFetchError('请输入有效的 URL（以 http:// 或 https:// 开头）');
@@ -173,6 +176,7 @@ export default function AddPage() {
       coverImage,
       summary,
       categoryId: categoryId || categories[0]?.id || '',
+      avatarText: avatarText.trim() || undefined,
       tags,
       createdAt: Date.now(),
       updatedAt: Date.now(),
@@ -245,7 +249,7 @@ export default function AddPage() {
                 </label>
                 <div className="relative group">
                   {coverImage && !imgError ? (
-                    <div className="rounded-2xl overflow-hidden aspect-[16/9]
+                    <div className="rounded-2xl overflow-hidden aspect-[16/9] lg:max-h-64
                       shadow-[6px_6px_14px_rgba(0,0,0,0.05),-4px_-4px_12px_rgba(255,255,255,0.9)]">
                       <img
                         src={coverImage}
@@ -258,7 +262,7 @@ export default function AddPage() {
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className="w-full rounded-2xl aspect-[16/9] flex items-center justify-center
+                      className="w-full rounded-2xl aspect-[16/9] lg:max-h-64 flex items-center justify-center
                         bg-gradient-to-br from-coral/10 to-coral/5 cursor-pointer
                         shadow-[6px_6px_14px_rgba(0,0,0,0.05),-4px_-4px_12px_rgba(255,255,255,0.9)]
                         hover:from-coral/15 hover:to-coral/10 transition-colors">
@@ -352,6 +356,23 @@ export default function AddPage() {
                     </button>
                   </div>
                 )}
+              </div>
+
+              {/* 头像文字 */}
+              <div className="mb-4">
+                <label className="text-[13px] font-medium text-text-secondary mb-1.5 block">
+                  头像文字 <span className="text-text-secondary/50 font-normal">（无封面时显示，最多10字，留空取标题首字）</span>
+                </label>
+                <input
+                  type="text"
+                  value={avatarText}
+                  onChange={(e) => setAvatarText(e.target.value.slice(0, 10))}
+                  maxLength={10}
+                  placeholder="例如：技、设计、好文"
+                  className="w-full h-11 px-4 rounded-xl bg-white border border-border
+                    text-[15px] text-text-primary placeholder:text-text-secondary/60
+                    focus:outline-none focus:border-coral/50"
+                />
               </div>
 
               {/* 标题 */}
