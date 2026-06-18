@@ -14,8 +14,25 @@ import { restoreScroll } from '@/lib/scroll';
 export default function HomePage() {
   const { bookmarks, loading } = useBookmarks();
   const { categories } = useCategories();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState(() => {
+    return sessionStorage.getItem('home-search') || '';
+  });
+  const [activeCategoryId, setActiveCategoryId] = useState<string | null>(() => {
+    return sessionStorage.getItem('home-category') || null;
+  });
+
+  // 筛选状态持久化到 sessionStorage
+  useEffect(() => {
+    sessionStorage.setItem('home-search', searchQuery);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    if (activeCategoryId) {
+      sessionStorage.setItem('home-category', activeCategoryId);
+    } else {
+      sessionStorage.removeItem('home-category');
+    }
+  }, [activeCategoryId]);
 
   // 视图模式（localStorage 持久化）
   const [viewMode, setViewMode] = useState<'card' | 'list'>(() => {
