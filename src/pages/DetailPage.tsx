@@ -38,6 +38,8 @@ export default function DetailPage() {
   // —— 标签编辑 ——
   const [localTags, setLocalTags] = useState<string[]>(bookmark?.tags ?? []);
   const [tagInput, setTagInput] = useState('');
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [dropIndex, setDropIndex] = useState<number | null>(null);
 
   // —— 分类编辑 ——
   const [localCategoryId, setLocalCategoryId] = useState(bookmark?.categoryId ?? '');
@@ -125,6 +127,31 @@ export default function DetailPage() {
     const newTags = localTags.filter((x) => x !== tag);
     setLocalTags(newTags);
     await update(bookmark.id, { tags: newTags });
+  };
+
+  const handleTagDragStart = (index: number) => {
+    setDragIndex(index);
+  };
+
+  const handleTagDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    setDropIndex(index);
+  };
+
+  const handleTagDrop = async (index: number) => {
+    if (dragIndex === null || dragIndex === index) return;
+    const newTags = [...localTags];
+    const [removed] = newTags.splice(dragIndex, 1);
+    newTags.splice(index, 0, removed);
+    setLocalTags(newTags);
+    setDragIndex(null);
+    setDropIndex(null);
+    await update(bookmark.id, { tags: newTags });
+  };
+
+  const handleTagDragEnd = () => {
+    setDragIndex(null);
+    setDropIndex(null);
   };
 
   const handleCategoryChange = async (catId: string) => {
@@ -373,11 +400,20 @@ export default function DetailPage() {
             标签
           </span>
           <div className="flex flex-wrap gap-1.5">
-            {localTags.map((t) => (
+            {localTags.map((t, i) => (
               <span
-                key={t}
-                className="inline-flex items-center gap-1 px-2.5 py-1
-                  rounded-full bg-coral-light text-coral text-[12px]"
+                key={`${t}-${i}`}
+                draggable
+                onDragStart={() => handleTagDragStart(i)}
+                onDragOver={(e) => handleTagDragOver(e, i)}
+                onDrop={() => handleTagDrop(i)}
+                onDragEnd={handleTagDragEnd}
+                className={`inline-flex items-center gap-1 px-2.5 py-1
+                  rounded-full bg-coral-light text-coral text-[12px]
+                  cursor-grab active:cursor-grabbing select-none
+                  ${dragIndex === i ? 'opacity-30' : ''}
+                  ${dropIndex === i && dragIndex !== i && dragIndex !== null ? 'ring-2 ring-coral/50 scale-105' : ''}
+                  transition-all duration-150`}
               >
                 {t}
                 <button

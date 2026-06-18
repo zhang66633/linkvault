@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import AvatarPlaceholder from './AvatarPlaceholder';
 import CategoryChip from './CategoryChip';
+import { saveScroll } from '@/lib/scroll';
 import type { IBookmark, ICategory } from '@/types';
 
 interface Props {
@@ -22,12 +23,18 @@ function extractDomain(url: string): string {
 /** 列表视图的紧凑横排条目 */
 export default function BookmarkListItem({ bookmark, category }: Props) {
   const navigate = useNavigate();
+  const location = useLocation();
   const [imgError, setImgError] = useState(false);
+
+  const handleClick = () => {
+    saveScroll(location.pathname);
+    navigate(`/bookmark/${bookmark.id}`);
+  };
 
   return (
     <button
       type="button"
-      onClick={() => navigate(`/bookmark/${bookmark.id}`)}
+      onClick={handleClick}
       className="flex items-center gap-3 py-2.5 border-b border-border/30 last:border-b-0
         active:bg-black/[0.02] hover:bg-black/[0.02] transition-colors cursor-pointer w-full text-left"
     >

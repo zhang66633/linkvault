@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import AvatarPlaceholder from './AvatarPlaceholder';
 import CategoryChip from './CategoryChip';
+import { saveScroll } from '@/lib/scroll';
 import type { IBookmark, ICategory } from '@/types';
 
 interface Props {
@@ -11,12 +12,18 @@ interface Props {
 
 export default function BookmarkCard({ bookmark, category }: Props) {
   const navigate = useNavigate();
+  const location = useLocation();
   const [imgError, setImgError] = useState(false);
+
+  const handleClick = () => {
+    saveScroll(location.pathname);
+    navigate(`/bookmark/${bookmark.id}`);
+  };
 
   return (
     <button
       type="button"
-      onClick={() => navigate(`/bookmark/${bookmark.id}`)}
+      onClick={handleClick}
       className="block w-full text-left
         active:scale-[0.98] transition-transform duration-200 cursor-pointer"
     >

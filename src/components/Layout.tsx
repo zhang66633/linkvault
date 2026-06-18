@@ -1,5 +1,6 @@
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeft, FolderOpen } from 'lucide-react';
+import { saveScroll } from '@/lib/scroll';
 
 const TITLE_MAP: Record<string, string> = {
   '/': 'LinkVault',
@@ -24,7 +25,7 @@ export default function Layout() {
           {!isHome && (
             <button
               type="button"
-              onClick={() => navigate(-1)}
+              onClick={() => { saveScroll(location.pathname); navigate(-1); }}
               className="w-8 h-8 flex items-center justify-center rounded-lg
                 hover:bg-black/5 transition-colors cursor-pointer"
               aria-label="返回"

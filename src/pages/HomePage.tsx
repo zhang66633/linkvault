@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { RefreshCw, LayoutGrid, List } from 'lucide-react';
 import SearchBar from '@/components/SearchBar';
 import CategoryFilter from '@/components/CategoryFilter';
@@ -9,6 +9,7 @@ import EmptyState from '@/components/EmptyState';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { useBookmarks, useCategories } from '@/hooks/useBookmarks';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
+import { restoreScroll } from '@/lib/scroll';
 
 export default function HomePage() {
   const { bookmarks, loading } = useBookmarks();
@@ -20,6 +21,11 @@ export default function HomePage() {
   const [viewMode, setViewMode] = useState<'card' | 'list'>(() => {
     return (localStorage.getItem('lv-view') as 'card' | 'list') || 'card';
   });
+
+  // 恢复滚动位置
+  useEffect(() => {
+    restoreScroll('/');
+  }, []);
 
   const toggleView = useCallback(() => {
     setViewMode((prev) => {
